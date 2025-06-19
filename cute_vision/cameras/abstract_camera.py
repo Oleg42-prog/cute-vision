@@ -46,3 +46,12 @@ class AbstractCamera(ABC):
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.disconnect()
         return None
+
+    def __iter__(self):
+        return self
+
+    def __next__(self) -> np.ndarray:
+        frame = self.fetch_frame()
+        if frame is None:
+            raise StopIteration("Failed to get frame from camera")
+        return frame
