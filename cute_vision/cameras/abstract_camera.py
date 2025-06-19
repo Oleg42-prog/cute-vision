@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Generator
 import numpy as np
 
 
@@ -55,3 +56,7 @@ class AbstractCamera(ABC):
         if frame is None:
             raise StopIteration("Failed to get frame from camera")
         return frame
+
+    def frames(self) -> Generator[np.ndarray, None, None]:
+        with self as camera:
+            yield from camera
