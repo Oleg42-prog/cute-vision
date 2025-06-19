@@ -37,3 +37,12 @@ class AbstractCamera(ABC):
     @property
     def frame_center(self):
         return self.frame_width_center, self.frame_height_center
+
+    def __enter__(self):
+        if not self.connect():
+            raise RuntimeError("Failed to connect to camera")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
+        return None
