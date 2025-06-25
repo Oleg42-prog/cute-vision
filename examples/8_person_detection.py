@@ -2,7 +2,7 @@ from ultralytics import YOLO
 from pipes_and_filters import Flow, Pipe, Splitter
 from cute_vision.cameras.device_camera import DeviceCamera
 from cute_vision.visualization.viewer import Viewer
-from cute_vision.filters.reduces.xyxy_to_points import reduce_xyxy_to_points
+from cute_vision.geometry.xyxy_to_points import reduce_xyxy_to_points
 from cute_vision.visualization.draw.points import draw_np_points
 from cute_vision.visualization.draw.colors import BGR_RED
 from cute_vision.utils import first
