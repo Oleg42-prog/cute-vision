@@ -4,6 +4,7 @@ from cute_vision.cameras.image_camera import ImageCamera
 from cute_vision.cameras.rtsp_camera import RTSPCamera
 from cute_vision.cameras.screen_camera import ScreenCamera
 from cute_vision.cameras.video_camera import VideoCamera
+from cute_vision.cameras.window_camera import WindowCamera
 
 
 __all__ = [
@@ -13,4 +14,5 @@ __all__ = [
     "RTSPCamera",
     "ScreenCamera",
     "VideoCamera",
+    "WindowCamera",
 ]
