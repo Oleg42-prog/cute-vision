@@ -1,5 +1,5 @@
 from cute_vision.cameras import VideoCamera
-from cute_vision.view import Viewer
+from cute_vision.visualization import Viewer
 
 VIDEO_PATH = 'your_video_path.mp4'
 

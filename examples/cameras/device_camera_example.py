@@ -1,5 +1,5 @@
 from cute_vision.cameras import DeviceCamera
-from cute_vision.view import Viewer
+from cute_vision.visualization import Viewer
 
 DEVICE_INDEX = 0
 WIDTH = 1280

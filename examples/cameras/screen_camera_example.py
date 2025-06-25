@@ -1,5 +1,5 @@
 from cute_vision.cameras import ScreenCamera
-from cute_vision.view import Viewer
+from cute_vision.visualization import Viewer
 
 MONITOR = 1
 LEFT = 0

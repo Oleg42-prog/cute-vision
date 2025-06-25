@@ -1,5 +1,5 @@
 from cute_vision.cameras import RTSPCamera
-from cute_vision.view import Viewer
+from cute_vision.visualization import Viewer
 
 RTSP_URL = ''
 WIDTH = 1280
