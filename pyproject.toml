@@ -3,22 +3,24 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "template-package"
-version = "0.0.1"
-description = "Template package"
+name = "cute-vision"
+version = "0.1.0"
+description = "Cute Vision"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.10"
 
 authors = [
-  { name = "Your Name", email = "your@email.com" }
+  { name = "Oleg Dudnik", email = "Oleggelo86@gmail.com" }
 ]
 
 dependencies = [
-  # "requests>=2.0",
+  "mss>=9.0.0",
+  "opencv-python>=4.8.0",
+  "numpy>=1.24.0",
+  "pipes-and-filters @ git+https://github.com/Oleg42-prog/pipes-and-filters.git"
 ]
 
 [project.optional-dependencies]
 dev = [
-  "pytest",
   "build"
 ]
