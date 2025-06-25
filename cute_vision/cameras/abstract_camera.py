@@ -60,3 +60,6 @@ class AbstractCamera(ABC):
     def frames(self) -> Generator[np.ndarray, None, None]:
         with self as camera:
             yield from camera
+
+    def first_frame(self) -> np.ndarray:
+        return next(self.frames())
