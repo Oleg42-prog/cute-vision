@@ -32,5 +32,5 @@ flow = Flow(
     sink=lambda points, frame: draw_np_points(frame, points, BGR_RED)
 )
 
-viewer = Viewer()
+viewer = Viewer('Person Detection Example')
 viewer.play(flow())

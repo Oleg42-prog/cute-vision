@@ -13,5 +13,5 @@ pipeline = Pipeline(
     )
 )
 
-viewer = Viewer('main-window')
+viewer = Viewer('Image Transforms Example')
 viewer.play(pipeline())
