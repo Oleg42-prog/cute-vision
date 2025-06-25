@@ -2,7 +2,7 @@
 
 A simple and intuitive Python library for computer vision tasks, designed to make prototyping and hypothesis testing effortless.
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)
+![Version](https://img.shields.io/badge/version-0.2.0-blue.svg)
 ![Status](https://img.shields.io/badge/status-alpha-orange.svg)
 ![Python](https://img.shields.io/badge/python-3.10+-green.svg)
 
@@ -11,6 +11,9 @@ A simple and intuitive Python library for computer vision tasks, designed to mak
 - **Multiple Camera Sources**: Support for webcams, RTSP streams, video files, screen capture, and static images
 - **Simple API**: Intuitive interface with context managers and iterators
 - **Image Processing**: Built-in filters and transformations
+- **Human Pose Estimation**: Work with human pose keypoints for pose-based applications
+- **Geometric Operations**: Convex hull operations for spatial analysis and region detection
+- **Event System**: Built-in event emitter for reactive programming patterns
 - **Easy Visualization**: Quick frame display and video playback
 - **Pipeline Integration**: Seamless integration with pipes-and-filters for complex processing workflows
 - **Rapid Prototyping**: Perfect for testing computer vision ideas quickly
@@ -29,7 +32,12 @@ The library requires Python 3.10+ and the following packages:
 - `opencv-python>=4.8.0`
 - `numpy>=1.24.0`
 - `mss>=9.0.0`
+- `PyDispatcher>=2.0.7`
 - `pipes-and-filters`
+
+### Optional Dependencies
+For pose estimation and advanced detection:
+- `ultralytics` (for YOLO models)
 
 ## 🚀 Quick Start
 
@@ -168,6 +176,78 @@ viewer = Viewer('Person Detection')
 viewer.play(flow())
 ```
 
+### Human Pose Estimation
+
+```python
+import numpy as np
+from ultralytics import YOLO  # pip install ultralytics
+from pipes_and_filters import Flow, Pipe, Splitter
+from cute_vision.cameras import DeviceCamera
+from cute_vision.tasks.pose import HumanPose
+from cute_vision.visualization import Viewer
+from cute_vision.visualization.draw.points import draw_np_points
+from cute_vision.visualization.draw.colors import BGR_RED
+from cute_vision.utils import first, safe_first
+
+model = YOLO('yolov8n-pose.pt')
+
+splitter = Splitter(
+    input_pipe=Pipe(
+        lambda x: model(x, classes=[0], conf=0.6, verbose=False),
+        first
+    ),
+    outputs_pipes=[
+        Pipe(
+            lambda result: result.keypoints.cpu().numpy().xy,
+            HumanPose.from_keypoints_list,
+            safe_first,
+            lambda pose: [] if not pose else [pose.middle_point],
+            np.array
+        ),
+        Pipe(
+            lambda result: result.plot()
+        )
+    ]
+)
+
+flow = Flow(
+    source=DeviceCamera(device_index=0).frames(),
+    splitter=splitter,
+    sink=lambda points, frame: draw_np_points(frame, points, BGR_RED)
+)
+
+viewer = Viewer()
+viewer.play(flow())
+```
+
+### Convex Hull Operations
+
+```python
+import numpy as np
+from cute_vision.geometry.convex_hull import ConvexHull
+from cute_vision.cameras import DeviceCamera
+from cute_vision.visualization import Viewer
+from cute_vision.visualization.draw.colors import BGR_RED, BGR_BLUE
+
+# Load predefined area from file
+convex_hull = ConvexHull('area.npy', 'danger_area')
+
+with DeviceCamera(device_index=0) as camera:
+    viewer = Viewer()
+
+    for frame in camera:
+        # Check if points are within the hull
+        test_points = [(100, 100), (200, 200)]
+        is_in_area = convex_hull.is_any_point_in_hull(test_points)
+
+        # Draw the hull on frame
+        color = BGR_RED if is_in_area else BGR_BLUE
+        frame = convex_hull.draw(frame, color)
+
+        if not viewer(frame):
+            break
+```
+
 ## 🏗️ Architecture
 
 ### Camera Classes
@@ -187,11 +267,26 @@ All camera classes inherit from `AbstractCamera` and provide:
 - **ScreenCamera**: Desktop screen capture
 - **ImageCamera**: Static image loading
 
+### Computer Vision Tasks
+
+- **Pose Estimation**: Human pose detection and keypoint extraction
+- **Detection**: Object detection workflows
+- **Segmentation**: Image segmentation tasks
+
+### Geometry Operations
+
+- **ConvexHull**: Spatial region analysis and point-in-polygon detection
+- **PursuitTransformer**: Coordinate transformation for tracking applications
+
 ### Filters and Transformations
 
 - **Colorspace**: BGR to grayscale conversions
 - **Flips**: Horizontal and vertical flipping
 - **Reduces**: Bounding box to point conversions
+
+### Event System
+
+- **EventEmitter**: Reactive programming with custom events for pipeline integration
 
 ### Visualization
 
