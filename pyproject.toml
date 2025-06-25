@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cute-vision"
-version = "0.1.0"
+version = "0.2.0"
 description = "Cute Vision"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,6 +17,7 @@ dependencies = [
   "mss>=9.0.0",
   "opencv-python>=4.8.0",
   "numpy>=1.24.0",
+  "PyDispatcher>=2.0.7",
   "pipes-and-filters @ git+https://github.com/Oleg42-prog/pipes-and-filters.git"
 ]
 
