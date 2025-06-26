@@ -84,6 +84,8 @@ def sink(hand_up_index, human_poses, frame, *args):
     global selected_track_id
     global tracker
 
+    frame = draw_text(frame, f'Selected track id: {selected_track_id}', (10, 60), BGR_RED)
+
     if hand_up_index is not None:
         track = safe_first([t for t in tracker.active_tracks if t.det_ind == hand_up_index])
         if track is not None:
@@ -94,16 +96,22 @@ def sink(hand_up_index, human_poses, frame, *args):
         if selected_track is not None:
             selected_track_id = selected_track.id
 
-    if selected_track_id is not None:
-        selected_track = safe_first([t for t in tracker.active_tracks if t.id == selected_track_id])
-        if selected_track is not None:
-            frame = draw_box(frame, selected_track.xyxy, BGR_RED)
-            human_pose = human_poses[int(selected_track.det_ind)]
-            middle_point = np.array(human_pose.middle_point)
-            discrepancy_ratio_x = pursuit_pipe(middle_point)
-            frame = draw_point(frame, middle_point.astype(int), BGR_RED, 10)
-            if discrepancy_ratio_x is not None:
-                frame = draw_text(frame, f'Discrepancy Ratio: {discrepancy_ratio_x:.2f}', (10, 30), BGR_RED)
+    if selected_track_id is None:
+        return frame
+
+    selected_track = safe_first([t for t in tracker.active_tracks if t.id == selected_track_id])
+    if selected_track is None:
+        selected_track_id = None
+        return frame
+
+    frame = draw_box(frame, selected_track.xyxy, BGR_RED)
+    human_pose = human_poses[int(selected_track.det_ind)]
+    if human_pose.middle_point is not None:
+        middle_point = np.array(human_pose.middle_point)
+        discrepancy_ratio_x = pursuit_pipe(middle_point)
+        frame = draw_point(frame, middle_point.astype(int), BGR_RED, 10)
+        if discrepancy_ratio_x is not None:
+            frame = draw_text(frame, f'Discrepancy Ratio: {discrepancy_ratio_x:.2f}', (10, 30), BGR_RED)
 
     return frame
 
