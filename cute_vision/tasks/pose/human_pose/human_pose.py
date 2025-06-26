@@ -12,6 +12,7 @@ class HumanPose:
     eyes: HumanPosePairPoints
     shoulders: HumanPosePairPoints
     hips: HumanPosePairPoints
+    wrists: HumanPosePairPoints
 
     @classmethod
     def from_keypoints_list(cls, keypoints_list: list[np.ndarray]) -> list[Self]:
@@ -39,11 +40,16 @@ class HumanPose:
         right_hip = HumanPosePoint(keypoints[12])
         hips = HumanPosePairPoints(left_hip, right_hip)
 
+        left_wrist = HumanPosePoint(keypoints[9])
+        right_wrist = HumanPosePoint(keypoints[10])
+        wrists = HumanPosePairPoints(left_wrist, right_wrist)
+
         return cls(
             nose=nose,
             eyes=eyes,
             shoulders=shoulders,
-            hips=hips
+            hips=hips,
+            wrists=wrists
         )
 
     @property
@@ -62,3 +68,23 @@ class HumanPose:
             return self.hips.middle_point
 
         return None
+
+    @property
+    def is_hand_up(self) -> bool:
+
+        shoulders_y = [self.shoulders.left_point.y, self.shoulders.right_point.y]
+        shoulders_y = list(filter(lambda y: y != 0, shoulders_y))
+        if not shoulders_y:
+            return False
+        shoulders_line_y = min(shoulders_y)
+
+        wrists_y = [self.wrists.left_point.y, self.wrists.right_point.y]
+        wrists_y = list(filter(lambda y: y != 0, wrists_y))
+        if not wrists_y:
+            return False
+        wrists_line_y = min(wrists_y)
+
+        if wrists_line_y < shoulders_line_y:
+            return True
+
+        return False
