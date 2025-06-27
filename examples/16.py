@@ -1,3 +1,4 @@
+import cv2
 import numpy as np
 from pydispatch import dispatcher
 from ultralytics import YOLO
@@ -14,6 +15,20 @@ from cute_vision.events import EventEmitter
 from cute_vision.geometry.pursuit_transformer import PursuitTransformer
 from cute_vision.visualization.draw.points import draw_point
 from cute_vision.visualization.draw.text import draw_text
+
+
+def draw_border_lines(frame, borders):
+
+    np_borders = np.array(borders)
+    frame_width = frame.shape[1]
+    frame_height = frame.shape[0]
+    pixel_borders = np_borders * frame_width // 2 + frame_width // 2
+    pixel_borders = pixel_borders.astype(int)
+
+    frame = cv2.line(frame, (pixel_borders[0], 0), (pixel_borders[0], frame_height), BGR_BLUE, 1)
+    frame = cv2.line(frame, (pixel_borders[1], 0), (pixel_borders[1], frame_height), BGR_BLUE, 1)
+
+    return frame
 
 
 def pursuit_event_handler(sender, **kwargs):
@@ -71,6 +86,7 @@ splitter = Splitter(
 pursuit_pipe = Pipe(
     pursuit_transformer,
     safe_first,
+    lambda x: None if -0.3 < x < 0.3 else x,
     lambda discrepancy_ratio_x: event_emitter(
         emit=discrepancy_ratio_x is not None,
         passthrough=discrepancy_ratio_x,
@@ -85,6 +101,7 @@ def sink(hand_up_index, human_poses, frame, *args):
     global tracker
 
     frame = draw_text(frame, f'Selected track id: {selected_track_id}', (10, 60), BGR_RED)
+    frame = draw_border_lines(frame, [-0.3, 0.3])
 
     if hand_up_index is not None:
         track = safe_first([t for t in tracker.active_tracks if t.det_ind == hand_up_index])
@@ -97,11 +114,13 @@ def sink(hand_up_index, human_poses, frame, *args):
             selected_track_id = selected_track.id
 
     if selected_track_id is None:
+        pursuit_pipe(pursuit_transformer.origin_point)
         return frame
 
     selected_track = safe_first([t for t in tracker.active_tracks if t.id == selected_track_id])
     if selected_track is None:
         selected_track_id = None
+        pursuit_pipe(pursuit_transformer.origin_point)
         return frame
 
     frame = draw_box(frame, selected_track.xyxy, BGR_RED)
