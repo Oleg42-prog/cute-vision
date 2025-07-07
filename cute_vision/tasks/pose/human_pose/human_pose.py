@@ -70,7 +70,7 @@ class HumanPose:
         return None
 
     @property
-    def is_hand_up(self) -> bool:
+    def is_hand_up_old(self) -> bool:
 
         shoulders_y = [self.shoulders.left_point.y, self.shoulders.right_point.y]
         shoulders_y = list(filter(lambda y: y != 0, shoulders_y))
@@ -85,6 +85,25 @@ class HumanPose:
         wrists_line_y = min(wrists_y)
 
         if wrists_line_y < shoulders_line_y:
+            return True
+
+        return False
+
+    def is_hand_up(self, threshold: int = 100) -> bool:
+
+        eyes_y = [self.eyes.left_point.y, self.eyes.right_point.y]
+        eyes_y = list(filter(lambda y: y != 0, eyes_y))
+        if not eyes_y:
+            return False
+        eyes_line_y = min(eyes_y)
+
+        wrists_y = [self.wrists.left_point.y, self.wrists.right_point.y]
+        wrists_y = list(filter(lambda y: y != 0, wrists_y))
+        if not wrists_y:
+            return False
+        wrists_line_y = min(wrists_y)
+
+        if wrists_line_y < eyes_line_y - threshold:
             return True
 
         return False
