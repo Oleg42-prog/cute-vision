@@ -9,6 +9,7 @@ from cute_vision.utils import first
 
 
 model = YOLO('yolov8n.pt')
+DEVICE_INDEX = 'rtsp://admin:rumicon_rumicon@172.16.70.110:554/ISAPI/Streaming/Channels/101'
 
 splitter = Splitter(
     input_pipe=Pipe(
@@ -27,7 +28,7 @@ splitter = Splitter(
 )
 
 flow = Flow(
-    source=DeviceCamera(device_index=0).frames(),
+    source=DeviceCamera(device_index=DEVICE_INDEX).frames(),
     splitter=splitter,
     sink=lambda points, frame: draw_np_points(frame, points, BGR_RED)
 )
